@@ -10,15 +10,28 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-def conversoes():
+
+
+def compromisso():
+  print('Digite o nome do compromisso')
+  titulo = input()
+  print('Digite a descrição do seu compromisso - (Se optar por não colocar, enviar vazio)')
+  descricao = input()
+  
+  return titulo, descricao
+
+def data():
+  print('Digite a data do compromisso no formato dia-mês-ano')
   data = datetime.datetime.strptime(input(), '%d-%m-%Y').strftime('%Y-%m-%d')
-  hora_inicial = input() + ':00:00-03:00'
-  hora_final = input() + ':00:00-03:00'
+  print('Digite a hora de inicio do compromisso no formato hora:minuto')
+  hora_inicial = input() + ':00-03:00'
+  print('Digite a hora do final do compromisso no formato hora:minuto')
+  hora_final = input() + ':00-03:00'
   inicio = data + 'T' + hora_inicial
   fim = data + 'T' + hora_final
   return inicio, fim
 
-def main(inicio, fim):
+def main(inicio, fim, titulo, descricao):
   """Shows basic usage of the Google Calendar API.
   Prints the start and name of the next 10 events on the user's calendar.
   """
@@ -52,12 +65,10 @@ def main(inicio, fim):
             'dateTime': fim,
             'timeZone': 'America/Sao_Paulo',
         },
-        'summary': 'Teste',
-        'description': 'Teste da descricao mulekada',
+        'summary': titulo,
+        'description': descricao,
         'recurrence': [
             'RRULE:FREQ=DAILY;COUNT=1'
-        ],
-        'attendees': [
         ],
         'reminders': {
             'useDefault': False,
@@ -67,16 +78,13 @@ def main(inicio, fim):
             ],
         },
     }
-
     service = build("calendar", "v3", credentials=creds)
-
     event = service.events().insert(calendarId='primary', body=event).execute()
     print ('Event created: %s' % (event.get('htmlLink')))
 
-    
     # Call the Calendar API
     now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
-    print("Getting the upcoming 10 events")
+    print("Próximos 10 eventos na sua agenda")
     events_result = (
         service.events()
         .list(
@@ -99,8 +107,6 @@ def main(inicio, fim):
       start = event["start"].get("dateTime", event["start"].get("date"))
       print(start, event["summary"])
       
-
-
   except HttpError as error:
     print(f"An error occurred: {error}")
 
@@ -108,5 +114,6 @@ def main(inicio, fim):
 # if __name__ == "__main__":
 #   main()
 
-a, b =conversoes()
-main(a, b)
+c, d = compromisso()
+a, b = data()
+main(a, b, c, d)
