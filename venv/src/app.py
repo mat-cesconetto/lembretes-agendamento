@@ -10,22 +10,15 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-data = input()
-hora_inicial = input()
-hora_final = input()
-inicio = ''
-fim = ''
-
 def conversoes():
-  data = datetime.datetime.strptime(data, '%d-%m-%Y')
-  data = data.date()
-  data = data.strftime('%Y-%m-%d')
-  
-  inicio = data + 'T' + hora_inicial + '-03:00'
-  fim = data + 'T' + hora_final + '-03:00'
+  data = datetime.datetime.strptime(input(), '%d-%m-%Y').strftime('%Y-%m-%d')
+  hora_inicial = input() + ':00:00-03:00'
+  hora_final = input() + ':00:00-03:00'
+  inicio = data + 'T' + hora_inicial
+  fim = data + 'T' + hora_final
+  return inicio, fim
 
-
-def main():
+def main(inicio, fim):
   """Shows basic usage of the Google Calendar API.
   Prints the start and name of the next 10 events on the user's calendar.
   """
@@ -115,7 +108,5 @@ def main():
 # if __name__ == "__main__":
 #   main()
 
-  
-# 'dateTime': '2024-07-24T09:00:00-03:00',
-conversoes()
-main()
+a, b =conversoes()
+main(a, b)
