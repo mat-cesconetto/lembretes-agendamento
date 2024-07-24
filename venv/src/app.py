@@ -13,9 +13,16 @@ SCOPES = ["https://www.googleapis.com/auth/calendar"]
 data = input()
 hora_inicial = input()
 hora_final = input()
+inicio = ''
+fim = ''
 
-inicio = data + 'T' + hora_inicial + '-03:00'
-fim = data + 'T' + hora_final + '-03:00'
+def conversoes():
+  data = datetime.datetime.strptime(data, '%d-%m-%Y')
+  data = data.date()
+  data = data.strftime('%Y-%m-%d')
+  
+  inicio = data + 'T' + hora_inicial + '-03:00'
+  fim = data + 'T' + hora_final + '-03:00'
 
 
 def main():
@@ -42,10 +49,9 @@ def main():
       token.write(creds.to_json())
 
   try:
-    print(inicio)
-    print(fim)
     event = {
         'start': {
+          # 'dateTime': '2024-07-24T09:00:00-03:00',
             'dateTime': inicio,
             'timeZone': 'America/Sao_Paulo',
         },
@@ -71,7 +77,7 @@ def main():
 
     service = build("calendar", "v3", credentials=creds)
 
-    # event = service.events().insert(calendarId='primary', body=event).execute()
+    event = service.events().insert(calendarId='primary', body=event).execute()
     print ('Event created: %s' % (event.get('htmlLink')))
 
     
@@ -111,5 +117,5 @@ def main():
 
   
 # 'dateTime': '2024-07-24T09:00:00-03:00',
-
+conversoes()
 main()
