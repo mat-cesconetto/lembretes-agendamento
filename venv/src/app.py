@@ -2,6 +2,7 @@ import datetime
 import os.path
 import dotenv
 import smtplib
+from email.message import EmailMessage
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -12,10 +13,6 @@ from googleapiclient.errors import HttpError
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 dotenv.load_dotenv(dotenv.find_dotenv())
-
-email_sender = os.getenv('email_sender')
-email_receiver = os.getenv('email_receiver')
-password = os.getenv('password')
 
 def compromisso():
   print('Digite o nome do compromisso')
@@ -116,12 +113,22 @@ def main(inicio, fim, titulo, descricao):
     print(f"An error occurred: {error}")
 
 
-# if __name__ == "__main__":
-#   main()
+def email(titulo):
+  msg = EmailMessage()
+  email_sender = os.getenv('email_sender')
+  email_receiver = os.getenv('email_receiver')
+  password = os.getenv('password')
+  
+  msg['Subject'] = titulo.upper()
+  msg['From'] = email_sender
+  msg['To'] = email_receiver
+  msg.set_content(f'O seu compromisso {titulo.upper()} é hoje')
+  
+  with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+    smtp.login(email_sender, password)
+    smtp.send_message(msg)
 
-c, d = compromisso()
-a, b = data()
-main(a, b, c, d)
-
-
-#token email vxae sydv gfcx okxb
+titulo, descricao = compromisso()
+inicio, fim = data()
+main(inicio, fim, titulo, descricao)
+email(titulo=titulo)
