@@ -1,6 +1,7 @@
 import datetime
 import os.path
-
+import dotenv
+import smtplib
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -10,7 +11,11 @@ from googleapiclient.errors import HttpError
 # If modifying these scopes, delete the file token.json.
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+dotenv.load_dotenv(dotenv.find_dotenv())
 
+email_sender = os.getenv('email_sender')
+email_receiver = os.getenv('email_receiver')
+password = os.getenv('password')
 
 def compromisso():
   print('Digite o nome do compromisso')
@@ -117,3 +122,6 @@ def main(inicio, fim, titulo, descricao):
 c, d = compromisso()
 a, b = data()
 main(a, b, c, d)
+
+
+#token email vxae sydv gfcx okxb
