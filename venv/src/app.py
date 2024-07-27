@@ -128,7 +128,9 @@ def email(titulo):
     smtp.login(email_sender, password)
     smtp.send_message(msg)
 
-titulo, descricao = compromisso()
-inicio, fim = data()
-main(inicio, fim, titulo, descricao)
-email(titulo=titulo)
+
+if __name__ == '__main__':
+  titulo, descricao = compromisso()
+  inicio, fim = data()
+  main(inicio, fim, titulo, descricao)
+  email(titulo=titulo)
