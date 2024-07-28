@@ -1,30 +1,32 @@
+# Importando as bibliotecas
 import datetime
 import os.path
 import dotenv
 import smtplib
 from email.message import EmailMessage
+# Importando a api
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from dateutil import parser
+# Importando o outro arquivo (isso é feito pois o outro arquivo não rodaria diariamente propriamente, visto que o mesmo pediria todos os inputs)
 import app
 
-# datetime.datetime.now().date()
+# Escopo para acessar o Google Calendar
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
-  """Shows basic usage of the Google Calendar API.
-  Prints the start and name of the next 10 events on the user's calendar.
+  """Mostra o uso básico da API do Google Calendar.
+  Imprime o início e o nome dos próximos 10 eventos no calendário do usuário.
   """
   creds = None
-  # The file token.json stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
+  # O arquivo token.json armazena os tokens de acesso e atualização do usuário,
+  # e é criado automaticamente quando o fluxo de autorização é concluído pela primeira vez.
   if os.path.exists("token.json"):
     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
+  # Se não houver credenciais válidas disponíveis, faça o login do usuário.
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
@@ -33,15 +35,15 @@ def main():
           "credentials.json", SCOPES
       )
       creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
+    # Salva as credenciais para a próxima execução
     with open("token.json", "w") as token:
       token.write(creds.to_json())
 
   try:
     service = build("calendar", "v3", credentials=creds)
 
-    # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
+    # Chamando a API do Calendar
+    now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indica a hora UTC
     events_result = (
         service.events()
         .list(
@@ -55,18 +57,19 @@ def main():
     )
     events = events_result.get("items", [])
     if not events:
-      print("No upcoming events found.")
+      print("Nenhum evento futuro encontrado.")
       return
 
     for event in events:
       start = event["start"].get("dateTime")
       agora = datetime.datetime.utcnow().isoformat()
  
+      # Envia email se o evento for hoje
       if parser.parse(start).date() == parser.parse(agora).date():
           app.email(titulo=event['summary'])
       else:
           None
   except HttpError as error:
-    print(f"An error occurred: {error}")
+    print(f"Ocorreu um erro: {error}")
   
 main()

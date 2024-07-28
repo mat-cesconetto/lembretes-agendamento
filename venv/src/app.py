@@ -1,19 +1,23 @@
+# Importando as bibliotecas
 import datetime
 import os.path
 import dotenv
 import smtplib
 from email.message import EmailMessage
+# Importando a API do Google
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
-# If modifying these scopes, delete the file token.json.
+# Link para estabelecer a conexão com o calendário
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+# Procurando e carregando o ambiente virtual
 dotenv.load_dotenv(dotenv.find_dotenv())
 
+# Função que define o título e a descrição do compromisso
 def compromisso():
   print('Digite o nome do compromisso')
   titulo = input()
@@ -22,10 +26,11 @@ def compromisso():
   
   return titulo, descricao
 
+# Função que define a data do compromisso
 def data():
   print('Digite a data do compromisso no formato dia-mês-ano')
   data = datetime.datetime.strptime(input(), '%d-%m-%Y').strftime('%Y-%m-%d')
-  print('Digite a hora de inicio do compromisso no formato hora:minuto')
+  print('Digite a hora de início do compromisso no formato hora:minuto')
   hora_inicial = input() + ':00-03:00'
   print('Digite a hora do final do compromisso no formato hora:minuto')
   hora_final = input() + ':00-03:00'
@@ -33,17 +38,17 @@ def data():
   fim = data + 'T' + hora_final
   return inicio, fim
 
+# Função para criar compromissos e conectar com o Google Calendar
 def main(inicio, fim, titulo, descricao):
-  """Shows basic usage of the Google Calendar API.
-  Prints the start and name of the next 10 events on the user's calendar.
+  """Mostra o uso básico da API do Google Calendar.
+  Imprime o início e o nome dos próximos 10 eventos no calendário do usuário.
   """
   creds = None
-  # The file token.json stores the user's access and refresh tokens, and is
-  # created automatically when the authorization flow completes for the first
-  # time.
+  # O arquivo token.json armazena os tokens de acesso e atualização do usuário, 
+  # e é criado automaticamente quando o fluxo de autorização é concluído pela primeira vez.
   if os.path.exists("token.json"):
     creds = Credentials.from_authorized_user_file("token.json", SCOPES)
-  # If there are no (valid) credentials available, let the user log in.
+  # Se não houver credenciais válidas disponíveis, faça o login do usuário.
   if not creds or not creds.valid:
     if creds and creds.expired and creds.refresh_token:
       creds.refresh(Request())
@@ -52,14 +57,14 @@ def main(inicio, fim, titulo, descricao):
           "credentials.json", SCOPES
       )
       creds = flow.run_local_server(port=0)
-    # Save the credentials for the next run
+    # Salva as credenciais
     with open("token.json", "w") as token:
       token.write(creds.to_json())
 
   try:
+    # Criando o evento
     event = {
         'start': {
-          # 'dateTime': '2024-07-24T09:00:00-03:00',
             'dateTime': inicio,
             'timeZone': 'America/Sao_Paulo',
         },
@@ -84,8 +89,8 @@ def main(inicio, fim, titulo, descricao):
     event = service.events().insert(calendarId='primary', body=event).execute()
     print ('Event created: %s' % (event.get('htmlLink')))
 
-    # Call the Calendar API
-    now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indicates UTC time
+    # Chamando a API do Calendar
+    now = datetime.datetime.utcnow().isoformat() + "Z"  # 'Z' indica a hora UTC
     print("Próximos 10 eventos na sua agenda")
     events_result = (
         service.events()
@@ -101,18 +106,18 @@ def main(inicio, fim, titulo, descricao):
     events = events_result.get("items", [])
 
     if not events:
-      print("No upcoming events found.")
+      print("Nenhum evento futuro encontrado.")
       return
 
-    # Prints the start and name of the next 10 events
+    # Mostra o início e o nome dos próximos 10 eventos
     for event in events:
       start = event["start"].get("dateTime", event["start"].get("date"))
       print(start, event["summary"])
       
   except HttpError as error:
-    print(f"An error occurred: {error}")
+    print(f"Ocorreu um erro: {error}")
 
-
+# Função para enviar email
 def email(titulo):
   msg = EmailMessage()
   email_sender = os.getenv('email_sender')
@@ -127,7 +132,6 @@ def email(titulo):
   with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
     smtp.login(email_sender, password)
     smtp.send_message(msg)
-
 
 if __name__ == '__main__':
   titulo, descricao = compromisso()
