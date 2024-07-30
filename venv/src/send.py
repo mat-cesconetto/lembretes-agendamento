@@ -12,7 +12,11 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from dateutil import parser
 # Importando o outro arquivo (isso é feito pois o outro arquivo não rodaria diariamente propriamente, visto que o mesmo pediria todos os inputs)
+<<<<<<< HEAD
 import app1
+=======
+import app
+>>>>>>> b7d6aef04c1c09fcab099139d569f41c16c19086
 
 # Escopo para acessar o Google Calendar
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
