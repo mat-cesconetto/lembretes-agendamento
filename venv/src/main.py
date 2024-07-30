@@ -33,7 +33,7 @@ class MyApp(QWidget):
         layout.addLayout(linha2)
 
         linha3 = QHBoxLayout()
-        button = QPushButton('Marcar Compromisso', clicked=self.Teste)
+        button = QPushButton('Marcar Compromisso', clicked=self.marcar)
         button.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         linha3.addWidget(button)
         layout.addLayout(linha3)
@@ -44,18 +44,19 @@ class MyApp(QWidget):
         label = QLabel('Seus Compromissos')
         imagem = QPixmap('venv/src/reload.png')
         imagem_redimensionada = imagem.scaled(30, 30, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        image = QLabel()
-        image.setPixmap(imagem_redimensionada)
-        image.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.image = QLabel()
+        self.image.setPixmap(imagem_redimensionada)
+        self.image.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.mousePressEvent = self.on_click
         linha4.addWidget(label)
-        linha4.addWidget(image)
+        linha4.addWidget(self.image)
         linha4.addStretch()
         #Grupo que reúne a linha 4 com a textedit
         grupo = QVBoxLayout()
         #Adicionando esses dois e aplicando na tela
         grupo.addLayout(linha4)
-        textao = QTextEdit()
-        grupo.addWidget(textao)
+        self.textao = QTextEdit()
+        grupo.addWidget(self.textao)
         layout.addLayout(grupo)
 
     def input_padrao(self, titulo, nome, linha):
@@ -82,7 +83,7 @@ class MyApp(QWidget):
         input_layout.addWidget(comp)
         linha.addLayout(input_layout)
             
-    def Teste(self):
+    def marcar(self):
         titulo = self.input_nome.text()
         descricao = self.input_desc.text()
         data = datetime.datetime.strptime(self.input_data.text(), '%d/%m/%Y').strftime('%Y-%m-%d')
@@ -91,7 +92,9 @@ class MyApp(QWidget):
         inicio = data + 'T' + hora_inicial
         fim = data + 'T' + hora_final
         app1.main(inicio, fim, titulo, descricao)
-
+    
+    def on_click(self, event):
+        self.textao.setText(app1.proximos())
         
 # 2015-05-28T09:00:00-03:00  
 
