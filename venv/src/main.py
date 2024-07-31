@@ -109,7 +109,7 @@ app.setStyleSheet('''
         font-size: 25px;
         margin-top: 30px;
     }
-    QLineEdit, QDateEdit, QTimeEdit, QPushButton {
+    QLineEdit, QDateEdit, QTimeEdit, QPushButton, QTextEdit {
         font-size: 20px;
         padding: 5px;
     }

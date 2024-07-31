@@ -3,6 +3,7 @@ import datetime
 import os.path
 import dotenv
 import smtplib
+from dateutil import parser
 from email.message import EmailMessage
 # Importando a API do Google
 from google.auth.transport.requests import Request
@@ -112,11 +113,17 @@ def proximos():
         # Mostra o início e o nome dos próximos 10 eventos
         for event in events:
             start = event['start'].get('dateTime', event['start'].get('date'))
-            resultado += f"{start} - {event.get('summary')}\n"
+            end = event['end'].get('dateTime', event['start'].get('date'))
+            data = parser.parse(start).date()
+            data =  data.strftime('%d/%m/%Y')
+            hora1 = parser.parse(start).strftime('%H:%M')
+            hora2 = parser.parse(end).strftime('%H:%M')
+            resultado += f"{data} - ({hora1} - {hora2}) - {event.get('summary')}\n"
+            
 
     except HttpError as error:
         resultado = f"Ocorreu um erro: {error}"
     return resultado
 
 if __name__ == '__main__':
-  main()
+  proximos()
